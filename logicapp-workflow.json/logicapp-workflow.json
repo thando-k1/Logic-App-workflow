@@ -1,0 +1,82 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_file_is_created": {
+                "recurrence": {
+                    "interval": 10,
+                    "frequency": "Second"
+                },
+                "evaluatedRecurrence": {
+                    "interval": 10,
+                    "frequency": "Second"
+                },
+                "metadata": {
+                    "6e202211-2856-4d17-9ded-5beb8b8626b0": "/"
+                },
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['onedrive-1']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/datasets/default/triggers/onnewfilev2",
+                    "queries": {
+                        "folderId": "6e202211-2856-4d17-9ded-5beb8b8626b0",
+                        "includeSubfolders": true,
+                        "inferContentType": true,
+                        "simulate": false
+                    }
+                }
+            }
+        },
+        "actions": {
+            "Send_email_(V2)": {
+                "runAfter": {},
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['gmail']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "body": {
+                        "To": "thandokhoza.contact@gmail.com",
+                        "Importance": "High",
+                        "Subject": "File upload email from Logic App",
+                        "Body": "<p class=\"editor-paragraph\">File @{base64ToString(triggerOutputs()['headers']['x-ms-file-name-encoded'])} has been uploaded to One Drive.</p>"
+                    },
+                    "path": "/v2/Mail"
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "onedrive-1": {
+                    "id": "/subscriptions/55e94a3b-81a1-4f67-9655-3c97f8903edc/providers/Microsoft.Web/locations/southafricanorth/managedApis/onedrive",
+                    "connectionId": "/subscriptions/55e94a3b-81a1-4f67-9655-3c97f8903edc/resourceGroups/Projects/providers/Microsoft.Web/connections/onedrive-2",
+                    "connectionName": "onedrive-2"
+                },
+                "gmail": {
+                    "id": "/subscriptions/55e94a3b-81a1-4f67-9655-3c97f8903edc/providers/Microsoft.Web/locations/southafricanorth/managedApis/gmail",
+                    "connectionId": "/subscriptions/55e94a3b-81a1-4f67-9655-3c97f8903edc/resourceGroups/Projects/providers/Microsoft.Web/connections/gmail",
+                    "connectionName": "gmail"
+                }
+            }
+        }
+    }
+}
